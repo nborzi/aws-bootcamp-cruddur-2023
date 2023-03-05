@@ -1,7 +1,8 @@
-# Week 1 — App Containerization
+## Week 1 — App Containerization
 Beforehand..
-# Open VS browser
-# click on search to download python and docker extension
+Open VS browser
+click on search to download python and docker extension
+
      cd backend-flask
      export FRONTEND_URL="*"
      export BACKEND_URL="*"
