@@ -359,6 +359,7 @@ ROLLBAR_ACCESS_TOKEN: "${ROLLBAR_ACCESS_TOKEN}"
 Import for Rollbar
 
 ```py
+import os
 import rollbar
 import rollbar.contrib.flask
 from flask import got_request_exception
@@ -393,4 +394,4 @@ def rollbar_test():
 ```
 
 
-[Rollbar Flask Example](https://github.com/rollbar/rollbar-flask-example/blob/master/hello.py)
+![image](https://user-images.githubusercontent.com/86881008/223826059-70814af2-d5ed-4b72-9181-4537b96bd8f1.png)
