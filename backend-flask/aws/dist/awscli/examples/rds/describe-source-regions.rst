@@ -88,8 +88,8 @@ Output::
                 "SupportsDBInstanceAutomatedBackupsReplication": true
             },
             {
-                "RegionName": "***REMOVED***",
-                "Endpoint": "https://rds.***REMOVED***.amazonaws.com",
+                "RegionName": "eu-west-2",
+                "Endpoint": "https://rds.eu-west-2.amazonaws.com",
                 "Status": "available",
                 "SupportsDBInstanceAutomatedBackupsReplication": true
             },

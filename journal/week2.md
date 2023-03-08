@@ -184,12 +184,12 @@ Create a aws/json folder to the project and add a xray.json file
     }
   }
 ```
- in ssh create a new group in x-ray (note aws region must be set you can check with aws configure and set up for ***REMOVED***, you can check if it is created in the console by accessing https://***REMOVED***.console.aws.amazon.com/cloudwatch/home?region=***REMOVED***#xray:settings/groups  
+ in ssh create a new group in x-ray (note aws region must be set you can check with aws configure and set up for eu-west-2, you can check if it is created in the console by accessing https://eu-west-2.console.aws.amazon.com/cloudwatch/home?region=eu-west-2#xray:settings/groups  
  ```sh
 FLASK_ADDRESS="https://4567-${GITPOD_WORKSPACE_ID}.${GITPOD_WORKSPACE_CLUSTER_HOST}"
 aws xray create-group    --group-name "Cruddur"    --filter-expression "service(\"backend-flask"\)"
 ```
-go to the link to access the sampling rules https://***REMOVED***.console.aws.amazon.com/cloudwatch/home?region=***REMOVED***#xray:settings/sampling-rules
+go to the link to access the sampling rules https://eu-west-2.console.aws.amazon.com/cloudwatch/home?region=eu-west-2#xray:settings/sampling-rules
 ```sh
 aws xray create-sampling-rule --cli-input-json file://aws/json/xray.json
 ```
@@ -204,7 +204,7 @@ go to the docker-compose file and add the below
     environment:
       AWS_ACCESS_KEY_ID: "${AWS_ACCESS_KEY_ID}"
       AWS_SECRET_ACCESS_KEY: "${AWS_SECRET_ACCESS_KEY}"
-      AWS_REGION: "***REMOVED***"
+      AWS_REGION: "eu-west-2"
     command:
       - "xray -o -b xray-daemon:2000"
     ports:
@@ -217,7 +217,7 @@ We need to add these two env vars to our backend-flask in our `docker-compose.ym
       AWS_XRAY_URL: "*4567-${GITPOD_WORKSPACE_ID}.${GITPOD_WORKSPACE_CLUSTER_HOST}*"
       AWS_XRAY_DAEMON_ADDRESS: "xray-daemon:2000"
 ```
-Go to this link to see the data https://***REMOVED***.console.aws.amazon.com/cloudwatch/home?region=***REMOVED***#xray:traces/query 
+Go to this link to see the data https://eu-west-2.console.aws.amazon.com/cloudwatch/home?region=eu-west-2#xray:traces/query 
 
 ![image](https://user-images.githubusercontent.com/86881008/223743953-b06e8ae0-2bf8-4e22-a7cb-d7f374493588.png)
 
@@ -319,7 +319,7 @@ Set the env var in your backend-flask for `docker-compose.yml`
       AWS_SECRET_ACCESS_KEY: "${AWS_SECRET_ACCESS_KEY}"
 ```
 
-https://***REMOVED***.console.aws.amazon.com/cloudwatch/home?region=***REMOVED***#logsV2:log-groups/log-group/cruddur
+https://eu-west-2.console.aws.amazon.com/cloudwatch/home?region=eu-west-2#logsV2:log-groups/log-group/cruddur
 ![image](https://user-images.githubusercontent.com/86881008/223775208-184f50b8-2d3b-487e-bfbc-0c7109222ac1.png)
 
 
@@ -359,6 +359,7 @@ ROLLBAR_ACCESS_TOKEN: "${ROLLBAR_ACCESS_TOKEN}"
 Import for Rollbar
 
 ```py
+import os
 import rollbar
 import rollbar.contrib.flask
 from flask import got_request_exception
@@ -393,4 +394,4 @@ def rollbar_test():
 ```
 
 
-[Rollbar Flask Example](https://github.com/rollbar/rollbar-flask-example/blob/master/hello.py)
+![image](https://user-images.githubusercontent.com/86881008/223826059-70814af2-d5ed-4b72-9181-4537b96bd8f1.png)

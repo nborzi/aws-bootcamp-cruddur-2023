@@ -446,12 +446,12 @@
                                                         {
                                                             "ref": "Region"
                                                         },
-                                                        "***REMOVED***"
+                                                        "eu-west-2"
                                                     ]
                                                 }
                                             ],
                                             "endpoint": {
-                                                "url": "https://grafana.***REMOVED***.amazonaws.com",
+                                                "url": "https://grafana.eu-west-2.amazonaws.com",
                                                 "properties": {},
                                                 "headers": {}
                                             },

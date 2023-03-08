@@ -49,13 +49,13 @@ Output::
                             "region": "us-west-2",
                             "image": "ami-a1b2c3d4567890ab",
                             "name": "Name 2020-02-18T22-49-08.131Z",
-                            "description": "Copies AMI to ***REMOVED*** and exports to S3"
+                            "description": "Copies AMI to eu-west-2 and exports to S3"
                         },
                         {
-                            "region": "***REMOVED***",
+                            "region": "eu-west-2",
                             "image": "ami-a1b2c3d4567890ab",
                             "name": "My 6 image 2020-02-18T22-49-08.131Z",
-                            "description": "Copies AMI to ***REMOVED*** and exports to S3"
+                            "description": "Copies AMI to eu-west-2 and exports to S3"
                         }
                     ]
                 },

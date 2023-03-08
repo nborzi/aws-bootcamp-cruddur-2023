@@ -24,8 +24,8 @@ Output::
                 "OptInStatus": "opt-in-not-required"
             },
             {
-                "Endpoint": "ec2.***REMOVED***.amazonaws.com",
-                "RegionName": "***REMOVED***",
+                "Endpoint": "ec2.eu-west-2.amazonaws.com",
+                "RegionName": "eu-west-2",
                 "OptInStatus": "opt-in-not-required"
             },
             {
@@ -157,8 +157,8 @@ Output::
                 "OptInStatus": "opt-in-not-required"
             },
             {
-                "Endpoint": "ec2.***REMOVED***.amazonaws.com",
-                "RegionName": "***REMOVED***",
+                "Endpoint": "ec2.eu-west-2.amazonaws.com",
+                "RegionName": "eu-west-2",
                 "OptInStatus": "opt-in-not-required"
             },
             {
@@ -255,7 +255,7 @@ Output::
     eu-north-1
     ap-south-1
     eu-west-3
-    ***REMOVED***
+    eu-west-2
     eu-west-1
     ap-northeast-3
     ap-northeast-2
