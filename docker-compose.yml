@@ -9,9 +9,6 @@ services:
       OTEL_SERVICE_NAME: 'backend-flask'
       AWS_XRAY_URL: "*4567-${GITPOD_WORKSPACE_ID}.${GITPOD_WORKSPACE_CLUSTER_HOST}*"
       AWS_XRAY_DAEMON_ADDRESS: "xray-daemon:2000"
-      AWS_ACCESS_KEY_ID: "${AWS_ACCESS_KEY_ID}"
-      AWS_SECRET_ACCESS_KEY: "${AWS_SECRET_ACCESS_KEY}"
-      AWS_REGION: 'eu-west-2'
     build: ./backend-flask
     ports:
       - "4567:4567"
@@ -47,13 +44,12 @@ services:
       - '5432:5432'
     volumes: 
       - db:/var/lib/postgresql/data
-
   xray-daemon:
     image: "amazon/aws-xray-daemon"
     environment:
       AWS_ACCESS_KEY_ID: "${AWS_ACCESS_KEY_ID}"
       AWS_SECRET_ACCESS_KEY: "${AWS_SECRET_ACCESS_KEY}"
-      AWS_DEFAULT_REGION: 'eu-west-2'
+      AWS_REGION: "eu-west-2"
     command:
       - "xray -o -b xray-daemon:2000"
     ports:
@@ -65,8 +61,6 @@ networks:
   internal-network:
     driver: bridge
     name: cruddur
-
-
 volumes:
   db:
     driver: local
