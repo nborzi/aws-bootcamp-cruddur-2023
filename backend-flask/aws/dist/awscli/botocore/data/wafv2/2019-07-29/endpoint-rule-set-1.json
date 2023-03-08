@@ -598,12 +598,12 @@
                                                         {
                                                             "ref": "Region"
                                                         },
-                                                        "***REMOVED***"
+                                                        "eu-west-2"
                                                     ]
                                                 }
                                             ],
                                             "endpoint": {
-                                                "url": "https://wafv2.***REMOVED***.amazonaws.com",
+                                                "url": "https://wafv2.eu-west-2.amazonaws.com",
                                                 "properties": {},
                                                 "headers": {}
                                             },

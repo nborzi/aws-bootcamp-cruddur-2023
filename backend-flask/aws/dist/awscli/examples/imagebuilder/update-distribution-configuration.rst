@@ -9,7 +9,7 @@ Contents of ``update-distribution-configuration.json``::
 
     {
         "distributionConfigurationArn": "arn:aws:imagebuilder:us-west-2:123456789012:distribution-configuration/myexampledistribution",
-        "description": "Copies AMI to ***REMOVED*** and exports to S3",
+        "description": "Copies AMI to eu-west-2 and exports to S3",
         "distributions": [
             {
                 "region": "us-west-2",
@@ -19,7 +19,7 @@ Contents of ``update-distribution-configuration.json``::
                 }
             },
             {
-                "region": "***REMOVED***",
+                "region": "eu-west-2",
                 "amiDistributionConfiguration": {
                     "name": "My {{imagebuilder:buildVersion}} image {{imagebuilder:buildDate}}"    
                 }
