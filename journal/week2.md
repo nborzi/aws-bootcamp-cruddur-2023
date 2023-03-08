@@ -105,7 +105,115 @@ from opentelemetry import trace
 tracer = trace.get_tracer(__name__)
 with tracer.start_as_current_span("http-handler"):
     with tracer.start_as_current_span("my-cool-function"):
-
 ```
 
 ![image](https://user-images.githubusercontent.com/86881008/223485734-c648e570-40bb-4dc3-a1ff-c49bc9fe465e.png)
+
+```
+from datetime import datetime, timedelta, timezone
+from opentelemetry import trace
+
+tracer = trace.get_tracer("home.activities")
+
+class HomeActivities:
+  def run():
+    with tracer.start_as_current_span("home-activites-mock-data"):
+      span = trace.get_current_span()
+      now = datetime.now(timezone.utc).astimezone()
+      span.set_attribute("app.now", now.isoformat())
+      results = [{
+```
+
+at the end (just line above results add the app result length 
+
+```
+      ]
+      span.set_attribute("app.result_length", len(results))
+      return results
+```
+
+
+# AWS x-ray 
+
+go to the requirements.txt file under backend and add the following line 
+
+```
+aws-xray-sdk
+```
+
+in ssh now cd to backend-flask and run the requirements file 
+
+```
+pip install -r requirements.txt 
+```
+
+go to aap.py and add the content 
+
+
+```
+from aws_xray_sdk.core import xray_recorder
+from aws_xray_sdk.ext.flask.middleware import XRayMiddleware
+
+xray_url = os.getenv("AWS_XRAY_URL")
+xray_recorder.configure(service='backend-flask', dynamic_naming=xray_url)
+
+#this needs to be added under app definition
+XRayMiddleware(app, xray_recorder)
+
+```
+![image](https://user-images.githubusercontent.com/86881008/223678376-53da1975-9e6e-4978-8b0f-beaa0090179e.png)
+
+
+### Setup AWS X-Ray Resources 
+
+Create a aws/json folder to the project and add a xray.json file 
+```
+{
+    "SamplingRule": {
+        "RuleName": "Cruddur",
+        "ResourceARN": "*",
+        "Priority": 9000,
+        "FixedRate": 0.1,
+        "ReservoirSize": 5,
+        "ServiceName": "backend-flask",
+        "ServiceType": "*",
+        "Host": "*",
+        "HTTPMethod": "*",
+        "URLPath": "*",
+        "Version": 1
+    }
+  }
+```
+ in ssh create a new group in x-ray (note aws region must be set you can check with aws configure and set up for ***REMOVED***, you can check if it is created in the console by accessing https://***REMOVED***.console.aws.amazon.com/cloudwatch/home?region=***REMOVED***#xray:settings/groups  
+ ```sh
+FLASK_ADDRESS="https://4567-${GITPOD_WORKSPACE_ID}.${GITPOD_WORKSPACE_CLUSTER_HOST}"
+aws xray create-group    --group-name "Cruddur"    --filter-expression "service(\"backend-flask"\)"
+```
+go to the link to access the sampling rules https://***REMOVED***.console.aws.amazon.com/cloudwatch/home?region=***REMOVED***#xray:settings/sampling-rules
+```sh
+aws xray create-sampling-rule --cli-input-json file://aws/json/xray.json
+```
+
+### Add Deamon Service to Docker Compose
+
+go to the docker-compose file and add the below 
+
+```yml
+  xray-daemon:
+    image: "amazon/aws-xray-daemon"
+    environment:
+      AWS_ACCESS_KEY_ID: "${AWS_ACCESS_KEY_ID}"
+      AWS_SECRET_ACCESS_KEY: "${AWS_SECRET_ACCESS_KEY}"
+      AWS_REGION: "***REMOVED***"
+    command:
+      - "xray -o -b xray-daemon:2000"
+    ports:
+      - 2000:2000/udp
+```
+
+We need to add these two env vars to our backend-flask in our `docker-compose.yml` file
+
+```yml
+      AWS_XRAY_URL: "*4567-${GITPOD_WORKSPACE_ID}.${GITPOD_WORKSPACE_CLUSTER_HOST}*"
+      AWS_XRAY_DAEMON_ADDRESS: "xray-daemon:2000"
+```
