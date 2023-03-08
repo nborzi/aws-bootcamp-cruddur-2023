@@ -217,3 +217,100 @@ We need to add these two env vars to our backend-flask in our `docker-compose.ym
       AWS_XRAY_URL: "*4567-${GITPOD_WORKSPACE_ID}.${GITPOD_WORKSPACE_CLUSTER_HOST}*"
       AWS_XRAY_DAEMON_ADDRESS: "xray-daemon:2000"
 ```
+Go to this link to see the data https://eu-west-2.console.aws.amazon.com/cloudwatch/home?region=eu-west-2#xray:traces/query 
+
+![image](https://user-images.githubusercontent.com/86881008/223743953-b06e8ae0-2bf8-4e22-a7cb-d7f374493588.png)
+
+#adding Subsegments to X-Ray 
+This goes beyond my knowledge in it - so i literally followed along 
+
+![image](https://user-images.githubusercontent.com/86881008/223755968-bbd57942-b6a4-4381-b814-880ce2928db0.png)
+
+aim is to get data to appear in X-Ray for activities that happens from user '@andrewbrown' and home page
+
+in app.py add these 2 rows under user and home activities in their appropriated segments 
+```
+@xray_recorder.capture('activities_users')
+@xray_recorder.capture('activities_show')
+```
+
+![image](https://user-images.githubusercontent.com/86881008/223756718-68059fd1-4538-49ca-842e-e503e4054926.png)
+
+
+in backend-flask> services> user_activities.py add the following to the main 
+```py
+from aws_xray_sdk.core import xray_recorder
+```
+
+after model data results then add the segment 
+
+```py 
+      subsegment = xray_recorder.begin_subsegment('mock-data')
+      # xray ---
+      dict = {
+        "now": now.isoformat(),
+        "results-size": len(model['data'])
+      }
+      subsegment.put_metadata('key', dict, 'namespace')
+      xray_recorder.end_subsegment()
+    finally:  
+    #  # Close the segment
+      xray_recorder.end_subsegment()
+```
+
+## CloudWatch Logs
+
+
+
+Add to the `requirements.txt`
+
+```
+watchtower
+```
+
+```sh
+pip install -r requirements.txt
+```
+
+
+In `app.py`
+
+```
+import watchtower
+import logging
+from time import strftime
+```
+
+```py
+# Configuring Logger to Use CloudWatch
+LOGGER = logging.getLogger(__name__)
+LOGGER.setLevel(logging.DEBUG)
+console_handler = logging.StreamHandler()
+cw_handler = watchtower.CloudWatchLogHandler(log_group='cruddur')
+LOGGER.addHandler(console_handler)
+LOGGER.addHandler(cw_handler)
+LOGGER.info("some message")
+```
+
+```py
+@app.after_request
+def after_request(response):
+    timestamp = strftime('[%Y-%b-%d %H:%M]')
+    LOGGER.error('%s %s %s %s %s %s', timestamp, request.remote_addr, request.method, request.scheme, request.full_path, response.status)
+    return response
+```
+
+We'll log something in an API endpoint
+```py
+LOGGER.info('Hello Cloudwatch! from  /api/activities/home')
+```
+
+Set the env var in your backend-flask for `docker-compose.yml`
+
+```yml
+      AWS_DEFAULT_REGION: "${AWS_DEFAULT_REGION}"
+      AWS_ACCESS_KEY_ID: "${AWS_ACCESS_KEY_ID}"
+      AWS_SECRET_ACCESS_KEY: "${AWS_SECRET_ACCESS_KEY}"
+```
+
+> passing AWS_REGION doesn't seems to get picked up by boto3 so pass default region instead
