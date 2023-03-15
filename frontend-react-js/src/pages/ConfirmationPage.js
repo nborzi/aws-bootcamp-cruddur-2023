@@ -71,7 +71,7 @@ export default function ConfirmationPage() {
     if (params.email) {
       setEmail(params.email)
     }
-  }, [])
+  },)
 
   return (
     <article className="confirm-article">

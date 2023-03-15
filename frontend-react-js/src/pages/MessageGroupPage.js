@@ -10,6 +10,7 @@ import MessagesForm from '../components/MessageForm';
 // [TODO] Authenication
 import Cookies from 'js-cookie'
 
+
 export default function MessageGroupPage() {
   const [messageGroups, setMessageGroups] = React.useState([]);
   const [messages, setMessages] = React.useState([]);
@@ -72,7 +73,7 @@ export default function MessageGroupPage() {
     loadMessageGroupsData();
     loadMessageGroupData();
     checkAuth();
-  }, [])
+  })
   return (
     <article>
       <DesktopNavigation user={user} active={'home'} setPopped={setPopped} />

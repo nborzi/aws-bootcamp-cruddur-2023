@@ -71,7 +71,7 @@ React.useEffect(()=>{
 
     loadData();
     checkAuth();
-  }, [])
+  })
 
   return (
     <article>
