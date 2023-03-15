@@ -11,13 +11,13 @@ export default function SigninPage() {
   const [email, setEmail] = React.useState('');
   const [password, setPassword] = React.useState('');
   const [errors, setErrors] = React.useState('');
-  const [cognitoErrors, setCognitoErrors] = React.useState('');
+ 
 
   const onsubmit = async (event) => {
     event.preventDefault();
     setErrors('');
     try {
-      Auth.signIn(username, password)
+      Auth.signIn(email, password)
         .then(user => {
           localStorage.setItem("access_token", user.signInUserSession.accessToken.jwtToken)
           window.location.href = "/"
