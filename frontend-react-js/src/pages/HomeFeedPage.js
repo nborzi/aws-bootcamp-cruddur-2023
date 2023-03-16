@@ -10,7 +10,7 @@ import ActivityForm from '../components/ActivityForm';
 import ReplyForm from '../components/ReplyForm';
 
 // [TODO] Authenication
-
+import Cookies from 'js-cookie'
 
 export default function HomeFeedPage() {
   const [activities, setActivities] = React.useState([]);
@@ -20,13 +20,12 @@ export default function HomeFeedPage() {
   const [user, setUser] = React.useState(null);
   const dataFetchedRef = React.useRef(false);
   
-
   const loadData = async () => {
     try {
-        const res = await fetch(backend_url, {
+      const backend_url = `${process.env.REACT_APP_BACKEND_URL}/api/activities/home`
+      const res = await fetch(backend_url, {
         method: "GET"
       });
-      const backend_url = `${process.env.REACT_APP_BACKEND_URL}/api/activities/home`
       let resJson = await res.json();
       if (res.status === 200) {
         setActivities(resJson)
@@ -37,6 +36,7 @@ export default function HomeFeedPage() {
       console.log(err);
     }
   };
+
 
 // check if we are authenicated
 const checkAuth = async () => {
@@ -56,9 +56,10 @@ const checkAuth = async () => {
       })
   })
   .catch((err) => console.log(err));
-}
+};
 
 
+ 
   React.useEffect(()=>{
     //prevents double call
     if (dataFetchedRef.current) return;
@@ -66,7 +67,7 @@ const checkAuth = async () => {
 
     loadData();
     checkAuth();
-  },[])
+  }, []);
 
   return (
     <article>

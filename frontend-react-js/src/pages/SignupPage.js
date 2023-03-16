@@ -7,6 +7,7 @@ import { Link } from "react-router-dom";
 // [TODO] Authenication
 import { Auth } from 'aws-amplify';
 
+
 export default function SignupPage() {
 
   // Username is Eamil
@@ -21,15 +22,15 @@ const onsubmit = async (event) => {
   event.preventDefault();
   setErrors('')
   console.log('username', username)
-  console.log('username', username)
-  console.log('username', username)
+  console.log('name', name)
+  console.log('email', email)
   try {
       const { user } = await Auth.signUp({
         username: email,
         password: password,
         attributes: {
             name: name,
-            email: username,
+            email: email,
             preferred_username: username,
         },
         autoSignIn: { // optional - enables auto sign in after user is confirmed
