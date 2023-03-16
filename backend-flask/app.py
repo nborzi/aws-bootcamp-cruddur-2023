@@ -41,7 +41,7 @@ import rollbar.contrib.flask
 from flask import got_request_exception
 
 # Configuring Logger to Use CloudWatch
-LOGGER = logging.getLogger(__name__)
+#LOGGER = logging.getLogger(__name__)
 #LOGGER.setLevel(logging.DEBUG)
 #console_handler = logging.StreamHandler()
 #cw_handler = watchtower.CloudWatchLogHandler(log_group='cruddur')
@@ -80,13 +80,7 @@ cognito_jwt_token = CognitoJwtToken(
 # X-RAY -------------
 XRayMiddleware(app, xray_recorder)
 
-cors = CORS(
-  app, 
-  resources={r"/api/*": {"origins": origins}},
-  headers=['Content-Type', 'Authorization'], 
-  expose_headers='Authorization',
-  methods="OPTIONS,GET,HEAD,POST"
-)
+
 
 # Rollbar --- 
 rollbar_access_token = os.getenv('ROLLBAR_ACCESS_TOKEN')
@@ -187,6 +181,14 @@ def data_home():
     app.logger.debug("unauthenicated")
     data = HomeActivities.run()
   return data, 200
+
+  cors = CORS(
+  app, 
+  resources={r"/api/*": {"origins": origins}},
+  headers=['Content-Type', 'Authorization'], 
+  expose_headers='Authorization',
+  methods="OPTIONS,GET,HEAD,POST"
+)
 
 @app.route("/api/activities/notifications", methods=['GET'])
 def data_notifications():
