@@ -29,7 +29,7 @@ class CognitoJwtToken:
             self.request_client = requests.get
         else:
             self.request_client = request_client
-        #self._load_jwk_keys()
+        self._load_jwk_keys()
 
 
     def _load_jwk_keys(self):
