@@ -291,3 +291,22 @@ psycopg[pool]
 ```
 pip install -r requirements.txt
 ```
+
+## to make stuff work from where I left 
+
+run the following commands 
+
+```sh 
+psql -Upostgres --host localhost
+#in backend run to create cruddur 
+ ./bin/db-create
+ ./bin/db-connect
+ 
+ psql -Upostgres cruddur < backend-flask/db/schema.sql 
+ 
+./bin/db-seed 
+```
+#then you should have the seed values inserted into the tables
+
+![image](https://user-images.githubusercontent.com/86881008/227713325-5119ccef-2a12-4ca2-a776-5c768b67a9be.png)
+
