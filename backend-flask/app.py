@@ -78,12 +78,12 @@ cognito_jwt_token = CognitoJwtToken(
 
 
 # X-RAY -------------
-XRayMiddleware(app, xray_recorder)
+#XRayMiddleware(app, xray_recorder)
 
 
 
 # Rollbar --- 
-rollbar_access_token = os.getenv('ROLLBAR_ACCESS_TOKEN')
+#rollbar_access_token = os.getenv('ROLLBAR_ACCESS_TOKEN')
 @app.before_first_request
 def init_rollbar():
     """init rollbar module"""
@@ -220,7 +220,7 @@ def data_activities():
   return
 
 @app.route("/api/activities/<string:activity_uuid>", methods=['GET'])
-#@xray_recorder.capture('activities_users')
+@xray_recorder.capture('activities_users')
 def data_show_activity(activity_uuid):
   data = ShowActivity.run(activity_uuid=activity_uuid)
   return data, 200
