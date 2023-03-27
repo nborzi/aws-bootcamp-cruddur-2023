@@ -310,3 +310,155 @@ psql -Upostgres --host localhost
 
 ![image](https://user-images.githubusercontent.com/86881008/227713325-5119ccef-2a12-4ca2-a776-5c768b67a9be.png)
 
+## Connect to RDS via Gitpod
+
+In order to connect to the RDS instance we need to provide our Gitpod IP and whitelist for inbound traffic on port 5432.
+
+```sh
+GITPOD_IP=$(curl ifconfig.me)
+```
+
+We'll create an inbound rule for Postgres (5432) and provide the GITPOD ID.
+
+We'll get the security group rule id so we can easily modify it in the future from the terminal here in Gitpod.
+
+```sh
+export DB_SG_ID="sg-0b725ebab7e25635e"
+gp env DB_SG_ID="sg-0b725ebab7e25635e"
+export DB_SG_RULE_ID="sgr-070061bba156cfa88"
+gp env DB_SG_RULE_ID="sgr-070061bba156cfa88"
+```
+
+Whenever we need to update our security groups we can do this for access.
+```sh
+aws ec2 modify-security-group-rules \
+    --group-id $DB_SG_ID \
+    --security-group-rules "SecurityGroupRuleId=$DB_SG_RULE_ID,SecurityGroupRule={Description=GITPOD,IpProtocol=tcp,FromPort=5432,ToPort=5432,CidrIpv4=$GITPOD_IP/32}"
+```
+
+https://docs.aws.amazon.com/cli/latest/reference/ec2/modify-security-group-rules.html#examples
+
+## Test remote access
+
+We'll create a connection url:
+
+```
+postgresql://root:huEE33z2Qvl383@cruddur-db-instance.czz1cuvepklc.ca-central-1.rds.amazonaws.com:5433/cruddur
+```
+
+We'll test that it works in Gitpod:
+
+```sh
+psql postgresql://root:huEE33z2Qvl383@cruddur-db-instance.czz1cuvepklc.ca-central-1.rds.amazonaws.com:5432/cruddur
+```
+
+We'll update your URL for production use case
+
+```sh
+export PROD_CONNECTION_URL="postgresql://root:huEE33z2Qvl383@cruddur-db-instance.czz1cuvepklc.ca-central-1.rds.amazonaws.com:5432/cruddur"
+gp env PROD_CONNECTION_URL="postgresql://root:huEE33z2Qvl383@cruddur-db-instance.czz1cuvepklc.ca-central-1.rds.amazonaws.com:5432/cruddur"
+```
+
+## Update Bash scripts for production
+
+```sh
+if [ "$1" = "prod" ]; then
+  echo "Running in production mode"
+else
+  echo "Running in development mode"
+fi
+```
+
+We'll update:
+- db-connect
+- db-schema-load
+
+## Update Gitpod IP on new env var
+
+We'll add a command step for postgres:
+
+```sh
+    command: |
+      export GITPOD_IP=$(curl ifconfig.me)
+      source "$THEIA_WORKSPACE_ROOT/backend-flask/bin/db-update-sg-rule"
+```
+
+
+## Setup Cognito post confirmation lambda
+
+### Create the handler function
+
+- Create lambda in same vpc as rds instance Python 3.8
+- Add a layer for psycopg2 with one of the below methods for development or production 
+
+ENV variables needed for the lambda environment.
+```
+PG_HOSTNAME='cruddur-db-instance.czz1cuvepklc.ca-central-1.rds.amazonaws.com'
+PG_DATABASE='cruddur'
+PG_USERNAME='root'
+PG_PASSWORD='huEE33z2Qvl383'
+```
+
+The function
+
+```
+import json
+import psycopg2
+
+def lambda_handler(event, context):
+    user = event['request']['userAttributes']
+    try:
+        conn = psycopg2.connect(
+            host=(os.getenv('PG_HOSTNAME')),
+            database=(os.getenv('PG_DATABASE')),
+            user=(os.getenv('PG_USERNAME')),
+            password=(os.getenv('PG_SECRET'))
+        )
+        cur = conn.cursor()
+        cur.execute("INSERT INTO users (display_name, handle, cognito_user_id) VALUES(%s, %s, %s)", (user['name'], user['email'], user['sub']))
+        conn.commit() 
+
+    except (Exception, psycopg2.DatabaseError) as error:
+        print(error)
+        
+    finally:
+        if conn is not None:
+            cur.close()
+            conn.close()
+            print('Database connection closed.')
+
+    return event
+```
+
+### Development
+https://github.com/AbhimanyuHK/aws-psycopg2
+
+`
+This is a custom compiled psycopg2 C library for Python. Due to AWS Lambda missing the required PostgreSQL libraries in the AMI image, we needed to compile psycopg2 with the PostgreSQL libpq.so library statically linked libpq library instead of the default dynamic link.
+`
+
+`EASIEST METHOD`
+
+Some precompiled versions of this layer are available publicly on AWS freely to add to your function by ARN reference.
+
+https://github.com/jetbridge/psycopg2-lambda-layer
+
+- Just go to Layers + in the function console and add a reference for your region
+
+`arn:aws:lambda:ca-central-1:898466741470:layer:psycopg2-py38:1`
+
+
+Alternatively you can create your own development layer by downloading the psycopg2-binary source files from https://pypi.org/project/psycopg2-binary/#files
+
+- Download the package for the lambda runtime environment: [psycopg2_binary-2.9.5-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl](https://files.pythonhosted.org/packages/36/af/a9f06e2469e943364b2383b45b3209b40350c105281948df62153394b4a9/psycopg2_binary-2.9.5-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl)
+
+- Extract to a folder, then zip up that folder and upload as a new lambda layer to your AWS account
+
+### Production
+
+Follow the instructions on https://github.com/AbhimanyuHK/aws-psycopg2 to compile your own layer from postgres source libraries for the desired version.
+
+
+## Add the function to Cognito 
+
+Under the user pool properties add the function as a `Post Confirmation` lambda trigger.
