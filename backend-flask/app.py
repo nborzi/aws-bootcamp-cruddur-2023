@@ -220,7 +220,7 @@ def data_activities():
   return
 
 @app.route("/api/activities/<string:activity_uuid>", methods=['GET'])
-#@xray_recorder.capture('activities_users')
+@xray_recorder.capture('activities_users')
 def data_show_activity(activity_uuid):
   data = ShowActivity.run(activity_uuid=activity_uuid)
   return data, 200
