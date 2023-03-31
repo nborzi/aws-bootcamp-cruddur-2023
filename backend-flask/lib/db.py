@@ -4,7 +4,7 @@ import re
 import sys
 from flask import current_app as app
 
-class Db:
+class db:
   def __init__(self):
     self.init_pool()
 
@@ -110,5 +110,3 @@ class Db:
     # print the pgcode and pgerror exceptions
     print ("pgerror:", err.pgerror)
     print ("pgcode:", err.pgcode, "\n")
-
-#db = Db()

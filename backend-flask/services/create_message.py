@@ -1,5 +1,6 @@
 import uuid
 from datetime import datetime, timedelta, timezone
+
 class CreateMessage:
   def run(message, user_sender_handle, user_receiver_handle):
     model = {
