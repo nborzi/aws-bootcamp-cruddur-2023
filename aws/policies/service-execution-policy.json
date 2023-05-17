@@ -1,0 +1,14 @@
+{
+  "Version": "2012-10-17",
+  "Statement": [
+      {
+          "Sid": "VisualEditor0",
+          "Effect": "Allow",
+          "Action": [
+              "ssm:GetParameters",
+              "ssm:GetParameter"
+          ],
+          "Resource": "arn:aws:ssm:eu-west-2:327143342815:parameter/cruddur/backend-flask/*"
+      }
+  ]
+}
